@@ -1,0 +1,11 @@
+# System requirements (Node project: JS packages are pinned in each package.json / package-lock.json)
+node>=20
+npm>=10
+MongoDB Atlas account (free tier) or local MongoDB   # backend MONGODB_URI
+MetaMask browser extension                           # approvers/admins only
+Polygon Amoy test MATIC (https://faucet.polygon.technology)  # only for Amoy deploys
+
+# JS packages are installed by setup.sh from:
+#   contracts/package.json
+#   backend/package.json
+#   frontend/package.json
