@@ -15,11 +15,14 @@ Output: `frontend/android/app/build/outputs/apk/debug/app-debug.apk`
 Install on a phone: enable "Install unknown apps", copy the APK over, tap it.
 Or with USB debugging + adb: `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`
 
-## Point the app at a reachable backend — set inside the app (no rebuild)
+## Backend URL
 
-A phone cannot reach `localhost` — that's the laptop, not the phone. Because the
-network (and the laptop's IP) changes between home and college, the backend URL is
-set **at runtime, inside the app**, not baked into the build:
+The APK ships pointing at the **live cloud backend** by default:
+`https://gatepass-backend-21cn.onrender.com/api` — so it works out of the box,
+anywhere, no setup. Just install and log in.
+
+To point at a *different* backend (e.g. a local dev server), override it
+**at runtime, inside the app** — no rebuild:
 
 1. Open the app → on the Login screen expand **"Server address"**.
 2. Enter the server the phone can reach, e.g. `http://10.0.0.5:4000/api`, and Save.

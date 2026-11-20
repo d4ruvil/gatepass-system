@@ -1,53 +1,36 @@
-# Deploy the backend (makes the app standalone)
+# Backend deployment (live)
 
-Goal: run the Express backend in the cloud so the Android app works anywhere on
-mobile data — no laptop, no same-Wi-Fi, no IP typing. DB (MongoDB Atlas) and
-blockchain (Polygon Amoy) are already cloud; only this server needs hosting.
+The backend runs in the cloud so the mobile app works anywhere — no laptop, no
+same-Wi-Fi. DB (MongoDB Atlas) and blockchain (Polygon Amoy) were already cloud;
+only this server needed hosting.
 
-## One-time setup on Render (free)
+**Live URL:** https://gatepass-backend-21cn.onrender.com
+**API base (used by the app):** https://gatepass-backend-21cn.onrender.com/api
 
-1. Push this repo to GitHub (private is fine) — see bottom if not pushed yet.
-2. Go to <https://render.com> → sign up / log in (GitHub login is easiest).
-3. **New** → **Blueprint** → pick this repo. Render reads `render.yaml` and
-   creates the `gatepass-backend` web service automatically.
-4. It will ask for the five secret env vars. Copy them from `backend/.env`:
-   - `MONGODB_URI`
-   - `JWT_SECRET`
-   - `RPC_URL`  (`https://polygon-amoy-bor-rpc.publicnode.com`)
-   - `CONTRACT_ADDRESS`  (`0xc44c4856eFE149241B4a36B0a5BB9935CA396518`)
-   - `RELAYER_PRIVATE_KEY`
-   (Don't set `PORT` — Render provides it; the server already reads it.)
-5. Click **Apply / Create**. Wait for the build to go live. You get a URL like
-   `https://gatepass-backend.onrender.com`.
+## How it's deployed (Docker image, no GitHub link)
 
-## Point the app at it (once per device)
+Render pulls a prebuilt image from GitHub Container Registry. No Git provider is
+connected to Render; the image is pushed from the local machine.
 
-Open the app → Login screen → **Server address** → enter:
+- Host: Render web service `gatepass-backend` (Free plan, Singapore region)
+- Image: `ghcr.io/d4ruvil/gatepass-backend:latest` (public package)
+- Env vars (set in Render dashboard → Environment, NOT in the image):
+  `MONGODB_URI`, `JWT_SECRET`, `RPC_URL`, `CONTRACT_ADDRESS`, `RELAYER_PRIVATE_KEY`
+  (do **not** set `PORT` — Render injects it)
+- MongoDB Atlas → Network Access must allow `0.0.0.0/0` (Render free has no static IP)
 
+## Update the backend after a code change
+
+```bash
+cd backend
+docker build -t ghcr.io/d4ruvil/gatepass-backend:latest .
+# one-time per session: gh auth token | docker login ghcr.io -u d4ruvil --password-stdin
+docker push ghcr.io/d4ruvil/gatepass-backend:latest
 ```
-https://gatepass-backend.onrender.com/api
-```
-
-Save. Done — the app now works on any network. Rebuilding the APK is NOT needed
-when your laptop/network changes anymore.
-
-## MongoDB Atlas network access
-
-In Atlas → **Network Access**, make sure `0.0.0.0/0` is allowed (or Render's IPs),
-otherwise the hosted server can't reach your database.
+Then in Render → the service → **Manual Deploy → Deploy latest reference**.
 
 ## Free-tier note
 
-Render's free web service sleeps after ~15 min idle; the first request after that
-takes ~30s to wake. Fine for a demo. For always-on, upgrade the plan or use a
-paid tier. While asleep the blockchain event sync pauses and resumes on wake.
-
-## If the repo isn't on GitHub yet
-
-```bash
-# create a private repo on github.com first, then:
-git remote add origin https://github.com/<you>/gatepass-system.git
-git push -u origin main
-```
-
-Render auto-redeploys on every push to `main`.
+The free instance spins down after ~15 min idle; the first request then takes
+~50s to wake. Fine for a demo. Blockchain event sync pauses while asleep and
+resumes on wake.
