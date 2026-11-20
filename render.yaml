@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: gatepass-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    # Secrets are NOT in this file — set them in the Render dashboard (or on first
+    # Blueprint deploy Render will prompt for each). Values live in backend/.env.
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RPC_URL
+        sync: false
+      - key: CONTRACT_ADDRESS
+        sync: false
+      - key: RELAYER_PRIVATE_KEY
+        sync: false

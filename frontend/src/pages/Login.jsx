@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api, { apiErrorMessage } from "../api";
+import api, { apiErrorMessage, getServerUrl, setServerUrl } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 const HOME_BY_ROLE = {
@@ -19,6 +19,15 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [server, setServer] = useState(getServerUrl());
+  const [serverSaved, setServerSaved] = useState(false);
+
+  function saveServer() {
+    setServerUrl(server);
+    setServer(getServerUrl());
+    setServerSaved(true);
+    setTimeout(() => setServerSaved(false), 2000);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -63,6 +72,22 @@ export default function Login() {
         <p className="muted" style={{ marginTop: 18 }}>
           A student? <Link to="/register">Create an account</Link>
         </p>
+        <details style={{ marginTop: 18 }}>
+          <summary className="muted" style={{ cursor: "pointer" }}>Server address</summary>
+          <div className="field" style={{ marginTop: 10 }}>
+            <label htmlFor="server">Backend URL (set your college server here)</label>
+            <input
+              id="server"
+              type="text"
+              value={server}
+              placeholder="http://10.0.0.5:4000/api"
+              onChange={(e) => setServer(e.target.value)}
+            />
+          </div>
+          <button type="button" className="btn" onClick={saveServer} style={{ width: "100%" }}>
+            {serverSaved ? "Saved ✓" : "Save server address"}
+          </button>
+        </details>
       </div>
     </div>
   );

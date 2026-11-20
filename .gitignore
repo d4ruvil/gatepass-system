@@ -11,3 +11,6 @@ backend/node_modules
 frontend/node_modules
 contracts/node_modules
 frontend/dist
+
+# built APKs
+*.apk
